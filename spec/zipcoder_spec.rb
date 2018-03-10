@@ -59,5 +59,10 @@ describe Zipcoder do
       expect(zip_info[:lat]).to eq(30.26)
       expect(zip_info[:long]).to eq(-97.74)
     end
+
+    it "zero pads the zip code when using an integer" do
+      zip_info = 705.zip_info
+      expect(zip_info[:city]).to eq("AIBONITO")
+    end
   end
 end
