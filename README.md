@@ -1,6 +1,6 @@
 # Zipcoder
 [![Gem Version](https://badge.fury.io/rb/zipcoder.svg)](https://badge.fury.io/rb/zipcoder)
-[![Circle CI](https://circleci.com/gh/ericchapman/zipcoder/tree/master.svg?&style=shield&circle-token=92813c17f9c9510c4c644e41683e7ba2572e0b2a)](https://circleci.com/gh/ericchapman/zipcoder/tree/master)
+[![Circle CI](https://circleci.com/gh/ericchapman/zipcoder/tree/master.svg?&style=shield&circle-token=a6120adc7b90f211b8c19b16e184da4123de671c)](https://circleci.com/gh/ericchapman/zipcoder/tree/master)
 [![Codecov](https://img.shields.io/codecov/c/github/ericchapman/zipcoder/master.svg)](https://codecov.io/github/ericchapman/zipcoder)
 
 Gem for performing zip code lookup operations
