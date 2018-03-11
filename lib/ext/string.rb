@@ -10,6 +10,10 @@ class String
     Zipcoder.city_info self, **kwargs
   end
 
+  def cities(**kwargs)
+    Zipcoder.cities self, **kwargs
+  end
+
   def to_zip
     self
   end

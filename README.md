@@ -7,6 +7,10 @@ Gem for performing zip code lookup operations
 
 ## Revision History
 
+ - v0.3.0:
+   - API Change!! - intitialization method change from "load_data" to "load_cache"
+   - added city and state caches
+   - added "cities" call
  - v0.2.0:
    - Internal code rework
    - API Change!! - changed "city,state" to return normalized info rather
@@ -42,17 +46,19 @@ when application is loaded, you can do the following RAILS example
 
 ``` ruby
 require 'zipcoder'
-Zipcoder.load_data
+Zipcoder.load_cache
 ```
 
-This will immediately load the data structures
+This will immediately load the data structures.  Currently it takes roughly 3s
+to create and import all of the data structures.  I will look at ways to
+reduce this later.
 
 ### Methods
 
 The library overrides the String (and in some instances Integer) class to 
 provide the following methods
 
-#### Lookup Zip Code
+#### "zip".zip_info
 
 This will return information about the zip code
 
@@ -84,7 +90,7 @@ puts "78748".zip_info(keys: [:city, :state])
 # > {:city=>"AUSTIN", :state=>"TX"}
 ```
 
-#### Lookup City
+#### "city, state".city_info
 
 This will return info about a city
 
@@ -93,6 +99,39 @@ require 'zipcoder'
 
 puts "Austin, TX".city_info
 # > {:zip=>"78701-78799", :city=>"AUSTIN", :state=>"TX", :lat=>30.26, :long=>-97.74}
+```
+
+Notes:
+
+ - the "zip", "lat", "long" are the combined values from all of the 
+   individual zip codes
+ - the library will normalize the key by removing all of the whitespace
+   and capitalizing the letters.  So for example, "Austin, TX" becomes 
+   "AUSTIN,TX"
+ - the library will cache the normalized cities to improve performance
+   on subsequent calls
+
+##### "keys" argument
+
+You can filter the keys that are returned by including the "keys" argument
+as shown below
+
+``` ruby
+require 'zipcoder'
+
+puts "Austin, TX".city_info(keys: [:zip])
+# > {:zip=>"78701-78799"}
+```
+
+#### "state".cities
+
+This will return the cities in a state
+
+``` ruby
+require 'zipcoder'
+
+puts "TX".cities
+# > {:zip=>"78701-7879", :city=>"AUSTIN", :state=>"TX", :lat=>30.26, :long=>-97.74}
 ```
 
 Notes:
