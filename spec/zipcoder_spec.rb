@@ -52,9 +52,14 @@ describe Zipcoder do
         expect(zip_infos.count).to eq(1745)
       end
 
-      it "returns zip codes that match a particular city/state" do
+      it "returns zip codes that match a particular city and state" do
         zip_infos = described_class.zip_info city: "Austin", state: "TX"
         expect(zip_infos.count).to eq(47)
+      end
+
+      it "returns zip codes that match a particular city with spaces and state" do
+        zip_infos = described_class.zip_info city: "San Antonio", state: "TX"
+        expect(zip_infos.count).to eq(65)
       end
     end
 
@@ -74,6 +79,15 @@ describe Zipcoder do
       expect(city_info[:zip]).to eq("78701-78799")
       expect(city_info[:lat]).to eq(30.315)
       expect(city_info[:long]).to eq(-48.87)
+    end
+
+    it "returns the normalized city/state value with space" do
+      city_info = described_class.city_info "San Antonio, TX"
+      expect(city_info[:city]).to eq("SAN ANTONIO")
+      expect(city_info[:state]).to eq("TX")
+      expect(city_info[:zip]).to eq("78201-78285")
+      expect(city_info[:lat]).to eq(29.435000000000002)
+      expect(city_info[:long]).to eq(-49.25)
     end
 
     it "returns the normalized city/state filtered" do
