@@ -7,6 +7,8 @@ Gem for performing zip code lookup operations
 
 ## Revision History
 
+ - v0.4.2:
+   - updated paths to fix RAILS require issue
  - v0.4.1:
    - bug fix for "capitalize_all"
  - v0.4.0:

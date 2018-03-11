@@ -1,7 +1,7 @@
 require "zipcoder/version"
 require "zipcoder/cacher/base"
-require "ext/string"
-require "ext/integer"
+require "zipcoder/ext/string"
+require "zipcoder/ext/integer"
 require "yaml"
 
 module Zipcoder

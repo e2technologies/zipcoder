@@ -1,5 +1,3 @@
-require_relative "../zipcoder"
-
 class String
 
   def zip_info(**kwargs)
