@@ -6,6 +6,9 @@ require "yaml"
 
 module Zipcoder
 
+  class ZipcoderError < Exception
+  end
+
   @@cacher = nil
   def self.cacher
     if @@cacher == nil
@@ -38,14 +41,45 @@ module Zipcoder
       # Iterate through and only add the ones that match the filters
       infos = []
       self.cacher.iterate_zips do |info|
-        if (city_filter == nil or info[:city] == city_filter) and
-            (state_filter == nil or info[:state] == state_filter)
+        if (city_filter == nil or info[:city].upcase == city_filter) and
+            (state_filter == nil or info[:state].upcase == state_filter)
           infos << self._filter_hash_args(info, kwargs[:keys])
         end
       end
 
       infos
     end
+  end
+
+  # Returns the cities that contain the zip codes
+  def self.zip_cities(zip_string, **kwargs)
+    max = kwargs[:max]
+
+    cities = {}
+    self._parse_zip_string(zip_string).each do |zip|
+      info = zip.zip_info
+      if info == nil
+        next
+      end
+
+      cities["#{info[:city]}, #{info[:state]}"] = true
+
+      if max != nil and cities.keys.count >= max
+        break
+      end
+    end
+
+    cities = cities.keys.uniq.sort
+
+    if kwargs[:names_only]
+      zips = cities.map{ |x| x.split(",")[0].strip }
+    else
+      zips = []
+      cities.each do |key|
+        zips << key.city_info(keys: kwargs[:keys])
+      end
+    end
+    zips
   end
 
   # Looks up city information
@@ -59,16 +93,29 @@ module Zipcoder
   end
 
   # Returns the cities in a state
-  def self.cities(state, **kwargs)
+  def self.state_cities(state, **kwargs)
     state = state.strip.upcase
 
-    # Filter the returned cities
-    infos = []
-    self.cacher.read_state_cache(state).each { |city|
-      infos << self.city_info("#{city}, #{state}", **kwargs)
-    }
+    names_only = kwargs[:names_only]
+    keys = kwargs[:keys]
 
-    infos
+    # Filter the returned cities
+    cities = self.cacher.read_state_cache(state)
+    if names_only
+      cities
+    else
+      infos = []
+      self.cacher.read_state_cache(state).each { |city|
+        infos << self.city_info("#{city}, #{state}", keys: keys)
+      }
+
+      infos
+    end
+  end
+
+  # Returns the states
+  def self.states
+    self.cacher.read_states
   end
 
   # Filters arguments in return hash
@@ -86,7 +133,7 @@ module Zipcoder
   # Returns a cache key
   def self._cache_key(city_state)
     unless city_state.include? ','
-      raise Exception, "city/state must include ','"
+      raise ZipcoderError, "city/state must include ','"
     end
 
     components = city_state.split(',')
@@ -94,6 +141,33 @@ module Zipcoder
     state = components[1].strip.upcase
 
     "#{city},#{state}"
+  end
+
+  # Parses a zip code string and returns all of the zip codes as
+  # an array
+  def self._parse_zip_string(zip_string)
+    zips = []
+
+    zip_string.split(",").each do |zip_component|
+      if zip_component.include? "-"
+        z = zip_component.split("-")
+        (z[0].strip.to_i..z[1].strip.to_i).each do |zip|
+          zips << self._check_zip(zip.to_zip)
+        end
+      else
+        zips << self._check_zip(zip_component.strip)
+      end
+    end
+
+    zips.sort.uniq
+  end
+
+  # Check the zip codes
+  def self._check_zip(zip)
+    if zip.length != 5
+      raise ZipcoderError, "zip code #{zip} is not 5 characters"
+    end
+    zip
   end
 
 

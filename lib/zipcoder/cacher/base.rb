@@ -53,16 +53,15 @@ module Cacher
 
       # Add the zip codes to the cache
       zip_codes.each do |zip, info|
+        city = info[:city].capitalize_all
+        info[:city] = city
+        state = info[:state]
 
         # Iterate through the zip codes and add them to the zip cache
         _write_cache _zip_cache(zip), info
 
-        # Populate City Cache
-        city = info[:city]
-        state = info[:state]
-
         # Create the city lookups
-        city_state = "#{city},#{state}"
+        city_state = "#{city.upcase},#{state.upcase}"
         infos = city_states[city_state] || []
         infos << info
         city_states[city_state] = infos
@@ -148,9 +147,9 @@ module Cacher
       zip_min = 100000
       zip_max = 0
       lat_min = 200
-      lat_max = 0
+      lat_max = -200
       long_min = 200
-      long_max = 0
+      long_max = -200
 
       # Iterate through the info and get min/max of zip/lat/long
       infos.each do |info|
@@ -179,8 +178,8 @@ module Cacher
             city: infos[0][:city],
             state: infos[0][:state],
             zip: "#{zip_min.to_zip}-#{zip_max.to_zip}",
-            lat: (lat_min+lat_max)/2,
-            long: (long_min+long_max)/2
+            lat: ((lat_min+lat_max)/2).round(4),
+            long: ((long_min+long_max)/2).round(4)
         }
       end
 

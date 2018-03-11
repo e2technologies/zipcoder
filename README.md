@@ -7,6 +7,13 @@ Gem for performing zip code lookup operations
 
 ## Revision History
 
+ - v0.4.0:
+   - abstracted "cacher" object to later support "redis" and "memcacher"
+   - API Change!! - changed name of "cities" to "state_cities"
+   - added "names_only" option to "state_cities"
+   - added "states" method that returns list of states
+   - added "zip_cities" method that returns the cities associated with a
+     list of zip codes
  - v0.3.0:
    - API Change!! - intitialization method change from "load_data" to "load_cache"
    - added city and state caches
@@ -58,41 +65,112 @@ reduce this later.
 The library overrides the String (and in some instances Integer) class to 
 provide the following methods
 
-#### "zip".zip_info
+#### Method: Zipcoder.zip_info(zip, **args)
 
-This will return information about the zip code
+Returns the info for the "zip"
+
+**variations:**
+
+ - ```Zipcoder.zip_info(78748, **args)```
+ - ```Zipcoder.zip_info("78748", **args)```
+ - ```"78748".zip_info(**args)```
+ - ```78748.zip_info(**args)```
+
+**parameters:**
+
+ - zip [String, Integer] - a string or integer representing a single zip code
+ - **return** [Hash] - zip object
+
+**arguments:**
+
+ - keys [Array] - array of keys to include (filters out the others)
+
+**notes:**
+
+ - none
+ 
+**examples:**
 
 ``` ruby
 require 'zipcoder'
 
+# Looks up a zip code by string
 puts "78748".zip_info
 # > {:zip=>"78748", :city=>"AUSTIN", :state=>"TX", :lat=>30.26, :long=>-97.74}
-```
 
-Note that this also works with Integer zip codes, for example
-
-``` ruby
-require 'zipcoder'
-
+# Looks up a zip code by integer
 puts 78748.zip_info
-# > {:zip=>"78748", :city=>"AUSTIN", :state=>"TX", :lat=>30.26, :long=>-97.74}
+# > {:zip=>"78748", :city=>"Austin", :state=>"TX", :lat=>30.26, :long=>-97.74}
+
 ```
 
-##### "keys" argument
+#### Method: Zipcoder.zip_cities(zip_string, **args)
 
-You can filter the keys that are returned by including the "keys" argument
-as shown below
+Returns the cities that are covered by the "zip_string"
+
+**variations:**
+
+ - ```Zipcoder.zip_cities("78701-78799,78613", **args)```
+ - ```"78701-78799,78613".zip_cities(**args)```
+
+**parameters:**
+
+ - zip_string [String] - a string containing comma delimited list of
+   zip codes and zip code ranges (ex. "78701-78750, 78613")
+ - **return** [Array] - array of zip objects or names (if "names_only"
+   is specified)
+
+**arguments:**
+
+ - keys [Array] - array of keys to include (filters out the others)
+ - names_only [Bool] - set to "true" if you only want the city names returned
+ - max [Integer] - maximum number of cities to return
+ 
+**notes:**
+
+ - none
+ 
+**examples:**
 
 ``` ruby
 require 'zipcoder'
 
-puts "78748".zip_info(keys: [:city, :state])
-# > {:city=>"AUSTIN", :state=>"TX"}
+# Returns the cities for a zip_code
+puts "78701-78750,78613".zip_cities
+# > [{:zip=>"78748", :city=>"Austin", :state=>"TX", :lat=>30.26, :long=>-97.74}, ...
+
+# Returns just the name of the cities
+puts "78701-78750,78613".zip_cities names_only: true
+# > ["Austin", "Cedar Park"]
 ```
 
-#### "city, state".city_info
+#### Method: Zipcoder.city_info(city_state, **args)
 
-This will return info about a city
+Returns the zip object for a city
+
+**variations:**
+
+ - ```Zipcoder.city_info("Atlanta, GA", **args)```
+ - ```"zip_string".zip_cities(**args)```
+
+**parameters:**
+
+ - city_state [String] - a string "city, state"
+ - **return** [Hash] - zip object
+
+**arguments:**
+
+ - keys [Array] - array of keys to include (filters out the others)
+ 
+**notes:**
+
+ - the "zip", "lat", "long" are the combined values from all of the 
+   individual zip codes
+ - the library will normalize the key by removing all of the whitespace
+   and capitalizing the letters.  So for example, " Los Angeles , CA " becomes 
+   "LOS ANGELES,CA"
+
+**examples:**
 
 ``` ruby
 require 'zipcoder'
@@ -101,61 +179,64 @@ puts "Austin, TX".city_info
 # > {:zip=>"78701-78799", :city=>"AUSTIN", :state=>"TX", :lat=>30.26, :long=>-97.74}
 ```
 
-Notes:
-
- - the "zip", "lat", "long" are the combined values from all of the 
-   individual zip codes
- - the library will normalize the key by removing all of the whitespace
-   and capitalizing the letters.  So for example, "Austin, TX" becomes 
-   "AUSTIN,TX"
- - the library will cache the normalized cities to improve performance
-   on subsequent calls
-
-##### "keys" argument
-
-You can filter the keys that are returned by including the "keys" argument
-as shown below
-
-``` ruby
-require 'zipcoder'
-
-puts "Austin, TX".city_info(keys: [:zip])
-# > {:zip=>"78701-78799"}
-```
-
-#### "state".cities
+#### Method: Zipcoder.state_cities(state, **args)
 
 This will return the cities in a state
 
-``` ruby
-require 'zipcoder'
+**variations:**
 
-puts "TX".cities
-# > {:zip=>"78701-7879", :city=>"AUSTIN", :state=>"TX", :lat=>30.26, :long=>-97.74}
-```
+ - ```Zipcoder.state_cities("GA", **args)```
+ - ```"GA".state_cities(**args)```
+ 
+**parameters:**
 
-Notes:
+ - state [String] - the 2 letter state abbreviation
+ - **return** [Array] - list of zip objects (or city names if "names_only")
+   is set
 
- - the "zip", "lat", "long" are the combined values from all of the 
-   individual zip codes
- - the library will normalize the key by removing all of the whitespace
-   and capitalizing the letters.  So for example, "Austin, TX" becomes 
-   "AUSTIN,TX"
- - the library will cache the normalized cities to improve performance
-   on subsequent calls
+**arguments:**
 
-##### "keys" argument
-
-You can filter the keys that are returned by including the "keys" argument
-as shown below
+ - keys [Array] - array of keys to include (filters out the others)
+ - names_only [Bool] - set to "true" if you only want the city names returned
+ 
+**examples:**
 
 ``` ruby
 require 'zipcoder'
 
-puts "Austin, TX".city_info(keys: [:zip])
-# > {:zip=>"78701-78799"}
+# Returns Objects
+puts "TX".state_cities
+# > [{:city=>"Abbott", :state=>"TX" ...
+
+# Returns List
+puts "TX".state_cities names_only: true
+# > ["Abbott", ...
 ```
 
+#### Method: Zipcoder.states
+
+This will return the states in the US
+
+**variations:**
+
+ - ```Zipcoder.states```
+ 
+**parameters:**
+
+ - none
+
+**arguments:**
+
+ - none
+ 
+**examples:**
+
+``` ruby
+require 'zipcoder'
+
+puts Zipcoder.states
+# > ["AK", "AL", ...
+```
 ### Updating Data
 
 The library is using the free public zip code data base located 
