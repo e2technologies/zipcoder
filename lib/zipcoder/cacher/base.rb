@@ -53,7 +53,7 @@ module Cacher
 
       # Add the zip codes to the cache
       zip_codes.each do |zip, info|
-        city = info[:city].capitalize_all
+        city = _capitalize_all(info[:city])
         info[:city] = city
         state = info[:state]
 
@@ -139,6 +139,10 @@ module Cacher
 
     def _states
       "zipcoder:states"
+    end
+
+    def _capitalize_all(string)
+      string.split(' ').map {|w| w.capitalize }.join(' ')
     end
 
     # Normalizes the values

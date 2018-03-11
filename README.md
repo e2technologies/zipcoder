@@ -7,6 +7,8 @@ Gem for performing zip code lookup operations
 
 ## Revision History
 
+ - v0.4.1:
+   - bug fix for "capitalize_all"
  - v0.4.0:
    - abstracted "cacher" object to later support "redis" and "memcacher"
    - API Change!! - changed name of "cities" to "state_cities"

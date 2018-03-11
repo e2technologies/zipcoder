@@ -22,8 +22,4 @@ class String
     self
   end
 
-  def capitalize_all
-    self.split(' ').map {|w| w.capitalize }.join(' ')
-  end
-
 end
