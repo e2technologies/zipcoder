@@ -7,6 +7,10 @@ Gem for performing zip code lookup operations
 
 ## Revision History
 
+ - v0.2.0:
+   - Internal code rework
+   - API Change!! - changed "city,state" to return normalized info rather
+     than array of zips, lats, longs
  - v0.1.0:
    - Initial Revision
 
@@ -68,6 +72,8 @@ puts 78748.zip_info
 # > {:zip=>"78748", :city=>"AUSTIN", :state=>"TX", :lat=>30.26, :long=>-97.74}
 ```
 
+##### "keys" argument
+
 You can filter the keys that are returned by including the "keys" argument
 as shown below
 
@@ -86,14 +92,20 @@ This will return info about a city
 require 'zipcoder'
 
 puts "Austin, TX".city_info
-# > {:zips=>["73301", ...], :city=>"AUSTIN", :state=>"TX", :lats=>[30.26, ...], :longs=>[-97.74, ...]}
+# > {:zip=>"78701-78799", :city=>"AUSTIN", :state=>"TX", :lat=>30.26, :long=>-97.74}
 ```
 
-The "zips", "lats", and "longs" are all arrays where each value is representing
-the info for a specific zip code.
+Notes:
 
-Note that the library will normalize the key by removing all of the whitespace
-and capitalizing the letters.  So for example, "Austin, TX" becomes "AUSTIN,TX".
+ - the "zip", "lat", "long" are the combined values from all of the 
+   individual zip codes
+ - the library will normalize the key by removing all of the whitespace
+   and capitalizing the letters.  So for example, "Austin, TX" becomes 
+   "AUSTIN,TX"
+ - the library will cache the normalized cities to improve performance
+   on subsequent calls
+
+##### "keys" argument
 
 You can filter the keys that are returned by including the "keys" argument
 as shown below
@@ -101,14 +113,15 @@ as shown below
 ``` ruby
 require 'zipcoder'
 
-puts "Austin, TX".city_info(keys: [:zips])
-# > {:zips=>["73301", ...]}
+puts "Austin, TX".city_info(keys: [:zip])
+# > {:zip=>"78701-78799"}
 ```
 
 ### Updating Data
 
-The library is using the free public zip code data base located [here](http://federalgovernmentzipcodes.us/).
-To update the database, run the following at command line from the top directory
+The library is using the free public zip code data base located 
+[here](http://federalgovernmentzipcodes.us/). To update the database, run the 
+following at command line from the top directory
 
 ```
 %> rake zipcoder:update  # Pulls the latest CSV file from the website
@@ -117,9 +130,14 @@ To update the database, run the following at command line from the top directory
 
 ## Development
 
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
+After checking out the repo, run `bin/setup` to install dependencies. Then, 
+run `rake spec` to run the tests. You can also run `bin/console` for an interactive 
+prompt that will allow you to experiment.
 
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+To install this gem onto your local machine, run `bundle exec rake install`. To 
+release a new version, update the version number in `version.rb`, and then run 
+`bundle exec rake release`, which will create a git tag for the version, push 
+git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
 
 ## Contributing
 

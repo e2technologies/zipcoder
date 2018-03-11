@@ -38,6 +38,8 @@ namespace :zipcoder do
     csv = CSV.parse(csv_text, :headers => true)
     puts "Importing data from '#{filename}'"
     csv.each do |row|
+      next if row["ZipCodeType"] != "STANDARD"
+
       zip_code = row["Zipcode"]
       city = row["City"]
       state = row["State"]
@@ -46,32 +48,11 @@ namespace :zipcoder do
 
       # Write the zip_lookup_data
       zip_lookup_data[zip_code] = { zip: zip_code, city: city, state: state, lat: lat, long: long }
-
-      # Write the city_lookup_data
-      city_key = "#{city},#{state}"
-      city_data = city_lookup_data[city_key] || {}
-
-      zips = city_data[:zips] || []
-      zips << zip_code
-
-      lats = city_data[:lats] || []
-      lats << lat
-
-      longs = city_data[:longs] || []
-      longs << long
-
-      city_lookup_data[city_key] = { zips: zips, city: city, state: state, lats: lats, longs: longs }
     end
 
     # Write the data to the yaml file
-    zip_lookup = "lib/data/zip_lookup.yml"
-    puts "Writing data to '#{zip_lookup}'"
-    File.open(zip_lookup, 'w') {|file| file.write zip_lookup_data.to_yaml }
-
-    # Write the city lookup data
-    city_lookup = "lib/data/city_lookup.yml"
-    puts "Writing data to '#{city_lookup}'"
-    File.open(city_lookup, 'w') {|file| file.write city_lookup_data.to_yaml }
-
+    zip_data = "lib/data/zip_data.yml"
+    puts "Writing data to '#{zip_data}'"
+    File.open(zip_data, 'w') {|file| file.write zip_lookup_data.to_yaml }
   end
 end
