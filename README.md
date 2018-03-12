@@ -7,6 +7,8 @@ Gem for performing zip code lookup operations
 
 ## Revision History
 
+ - v0.5.0:
+   - added Redis backend support
  - v0.4.2:
    - updated paths to fix RAILS require issue
  - v0.4.1:
@@ -63,6 +65,33 @@ Zipcoder.load_cache
 This will immediately load the data structures.  Currently it takes roughly 3s
 to create and import all of the data structures.  I will look at ways to
 reduce this later.
+
+#### Redis Support
+
+To use Redis as the cache for zipcoder rather than memory, you must do the
+following
+
+**install the 'redis' Gem (or add to your Gemfile if using Rails):**
+
+```ruby
+gme 'redis'
+```
+
+*Note that this Gem supports Ruby >= 2.0 so I could NOT use the latest Redis
+version.  I had to use v3.3.5 to test.*
+
+**create a redis cacher and pass it to the "load_cache" method:**
+
+```ruby
+require 'zipcoder'
+require 'zipcoder/cacher/redis'
+
+cacher = Zipcoder::Cacher::Redis.new(**args)
+Zipcoder.load_cache(cacher)
+```
+
+Please check the [here](https://github.com/redis/redis-rb) for the different
+options to use when instantiating the "Redis" client.
 
 ### Methods
 

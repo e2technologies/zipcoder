@@ -1,5 +1,5 @@
 require "zipcoder/version"
-require "zipcoder/cacher/base"
+require "zipcoder/cacher/memory"
 require "zipcoder/ext/string"
 require "zipcoder/ext/integer"
 require "yaml"
@@ -19,7 +19,7 @@ module Zipcoder
 
   # Loads the data into memory
   def self.load_cache(cacher=nil)
-    @@cacher = cacher || Cacher::Base.new
+    @@cacher = cacher || Cacher::Memory.new
     self.cacher.load
   end
 

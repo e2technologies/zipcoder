@@ -1,7 +1,10 @@
 require "spec_helper"
-require 'benchmark'
 
 describe Zipcoder do
+  before(:all) do
+    Zipcoder.load_cache
+  end
+
   it "has a version number" do
     expect(Zipcoder::VERSION).not_to be nil
   end

@@ -24,5 +24,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rspec', '>= 3.5.0'
   spec.add_development_dependency 'simplecov'
   spec.add_development_dependency 'codecov'
+  spec.add_development_dependency 'redis', "~> 3.3.5"
   spec.required_ruby_version = '>= 2.0'
 end
