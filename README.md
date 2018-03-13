@@ -74,7 +74,7 @@ following
 **install the 'redis' Gem (or add to your Gemfile if using Rails):**
 
 ```ruby
-gme 'redis'
+gem 'redis'
 ```
 
 *Note that this Gem supports Ruby >= 2.0 so I could NOT use the latest Redis
@@ -90,8 +90,8 @@ cacher = Zipcoder::Cacher::Redis.new(**args)
 Zipcoder.load_cache(cacher)
 ```
 
-Please check the [here](https://github.com/redis/redis-rb) for the different
-options to use when instantiating the "Redis" client.
+Please check [here](https://github.com/redis/redis-rb) for the different options 
+to use when instantiating the "Redis" client.
 
 ### Methods
 
@@ -184,7 +184,7 @@ Returns the zip object for a city
 **variations:**
 
  - ```Zipcoder.city_info("Atlanta, GA", **args)```
- - ```"zip_string".zip_cities(**args)```
+ - ```"Atlanta, GA".city_info(**args)```
 
 **parameters:**
 
