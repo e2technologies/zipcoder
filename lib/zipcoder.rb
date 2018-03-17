@@ -2,6 +2,7 @@ require "zipcoder/version"
 require "zipcoder/cacher/memory"
 require "zipcoder/ext/string"
 require "zipcoder/ext/integer"
+require "zipcoder/ext/array"
 require "yaml"
 
 module Zipcoder
@@ -56,27 +57,49 @@ module Zipcoder
     max = kwargs[:max]
 
     cities = {}
+    last_key = nil
     self._parse_zip_string(zip_string).each do |zip|
       info = zip.zip_info
       if info == nil
+        key = last_key
+      else
+        key = "#{info[:city]}, #{info[:state]}"
+      end
+      last_key = key
+
+      if key == nil
         next
       end
 
-      cities["#{info[:city]}, #{info[:state]}"] = true
+      zip_codes = cities[key] || []
+      zip_codes << zip
+      cities[key] = zip_codes
 
       if max != nil and cities.keys.count >= max
         break
       end
     end
 
-    cities = cities.keys.uniq.sort
 
-    if kwargs[:names_only]
-      zips = cities.map{ |x| x.split(",")[0].strip }
+    if kwargs[:grouped]
+      zips = {}
+      cities.each do |city, zip_codes|
+        key = zip_codes.combine_zips
+        if kwargs[:names_only]
+          zips[key] = city
+        else
+          zips[key] = city.city_info(keys: kwargs[:keys])
+        end
+      end
     else
-      zips = []
-      cities.each do |key|
-        zips << key.city_info(keys: kwargs[:keys])
+      cities = cities.keys.uniq.sort
+      if kwargs[:names_only]
+        zips = cities
+      else
+        zips = []
+        cities.each do |key|
+          zips << key.city_info(keys: kwargs[:keys])
+        end
       end
     end
     zips
@@ -164,11 +187,10 @@ module Zipcoder
 
   # Check the zip codes
   def self._check_zip(zip)
-    if zip.length != 5
+    unless zip.is_zip?
       raise ZipcoderError, "zip code #{zip} is not 5 characters"
     end
     zip
   end
-
 
 end

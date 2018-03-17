@@ -20,4 +20,8 @@ class String
     self
   end
 
+  def is_zip?
+    self.length == 5
+  end
+
 end

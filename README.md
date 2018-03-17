@@ -7,6 +7,8 @@ Gem for performing zip code lookup operations
 
 ## Revision History
 
+ - v0.6.0:
+   - added "grouped" option to "zip_cities"
  - v0.5.0:
    - added Redis backend support
  - v0.4.2:
@@ -104,10 +106,12 @@ Returns the info for the "zip"
 
 **variations:**
 
- - ```Zipcoder.zip_info(78748, **args)```
- - ```Zipcoder.zip_info("78748", **args)```
- - ```"78748".zip_info(**args)```
- - ```78748.zip_info(**args)```
+``` ruby
+Zipcoder.zip_info(78748, **args)
+Zipcoder.zip_info("78748", **args)
+"78748".zip_info(**args)
+78748.zip_info(**args)
+```
 
 **parameters:**
 
@@ -143,8 +147,10 @@ Returns the cities that are covered by the "zip_string"
 
 **variations:**
 
- - ```Zipcoder.zip_cities("78701-78799,78613", **args)```
- - ```"78701-78799,78613".zip_cities(**args)```
+``` ruby
+Zipcoder.zip_cities("78701-78799,78613", **args)
+"78701-78799,78613".zip_cities(**args)
+```
 
 **parameters:**
 
@@ -156,7 +162,8 @@ Returns the cities that are covered by the "zip_string"
 **arguments:**
 
  - keys [Array] - array of keys to include (filters out the others)
- - names_only [Bool] - set to "true" if you only want the city names returned
+ - names_only [Bool] - set to "true" if you only want the city/state names returned
+ - grouped [Bool] - set to "true" if you want the zip codes returned grouped by city/state
  - max [Integer] - maximum number of cities to return
  
 **notes:**
@@ -174,7 +181,15 @@ puts "78701-78750,78613".zip_cities
 
 # Returns just the name of the cities
 puts "78701-78750,78613".zip_cities names_only: true
-# > ["Austin", "Cedar Park"]
+# > ["Austin, TX", "Cedar Park, TX"]
+
+# Returns the cities grouped by city/state
+puts "78701-78750,78613".zip_cities grouped: true
+# > {"78701-78750" => {:zip=>"78748", :city=>"Austin", :state=>"TX", ...
+
+# Returns the cities grouped by city/state with names only
+puts "78701-78750,78613".zip_cities grouped: true, names_only: true
+# > {"78701-78750" => "Austin, TX", "78613" => "Cedar Park"}
 ```
 
 #### Method: Zipcoder.city_info(city_state, **args)
@@ -183,8 +198,10 @@ Returns the zip object for a city
 
 **variations:**
 
- - ```Zipcoder.city_info("Atlanta, GA", **args)```
- - ```"Atlanta, GA".city_info(**args)```
+``` ruby
+Zipcoder.city_info("Atlanta, GA", **args)
+"Atlanta, GA".city_info(**args)
+```
 
 **parameters:**
 
@@ -218,8 +235,10 @@ This will return the cities in a state
 
 **variations:**
 
- - ```Zipcoder.state_cities("GA", **args)```
- - ```"GA".state_cities(**args)```
+``` ruby
+Zipcoder.state_cities("GA", **args)
+"GA".state_cities(**args)
+```
  
 **parameters:**
 
@@ -252,7 +271,9 @@ This will return the states in the US
 
 **variations:**
 
- - ```Zipcoder.states```
+``` ruby
+Zipcoder.states
+```
  
 **parameters:**
 

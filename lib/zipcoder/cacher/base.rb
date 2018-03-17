@@ -1,3 +1,5 @@
+require_relative '../ext/array'
+
 module Zipcoder
   module Cacher
     # The cacher base class places all of the objects in memory.  The
@@ -146,8 +148,7 @@ module Zipcoder
       # Normalizes the values
       def _normalize_city(infos)
         # Values
-        zip_min = 100000
-        zip_max = 0
+        zips =[]
         lat_min = 200
         lat_max = -200
         long_min = 200
@@ -155,9 +156,7 @@ module Zipcoder
 
         # Iterate through the info and get min/max of zip/lat/long
         infos.each do |info|
-          zip = info[:zip].to_i
-          zip_min = zip if zip < zip_min
-          zip_max = zip if zip > zip_max
+          zips << info[:zip]
           lat_min = info[:lat] if info[:lat] < lat_min
           lat_max = info[:lat] if info[:lat] > lat_max
           long_min = info[:long] if info[:long] < long_min
@@ -179,7 +178,7 @@ module Zipcoder
           normalized = {
               city: infos[0][:city],
               state: infos[0][:state],
-              zip: "#{zip_min.to_zip}-#{zip_max.to_zip}",
+              zip: zips.combine_zips,
               lat: ((lat_min+lat_max)/2).round(4),
               long: ((long_min+long_max)/2).round(4)
           }
