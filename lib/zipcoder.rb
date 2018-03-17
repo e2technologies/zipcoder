@@ -58,14 +58,20 @@ module Zipcoder
 
     cities = {}
     last_key = nil
+    last_zip = nil
     self._parse_zip_string(zip_string).each do |zip|
       info = zip.zip_info
       if info == nil
-        key = last_key
+        if last_zip != nil and zip.to_i == last_zip.to_i + 1
+          key = last_key
+        else
+          key = nil
+        end
       else
         key = "#{info[:city]}, #{info[:state]}"
       end
       last_key = key
+      last_zip = zip
 
       if key == nil
         next

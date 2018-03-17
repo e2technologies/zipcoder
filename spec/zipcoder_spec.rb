@@ -193,10 +193,10 @@ describe Zipcoder do
 
     context "#grouped" do
       it "returns the cities grouped" do
-        zip_cities = "78751,13601,78613,78702-78750".zip_cities grouped: true
-        expect(zip_cities.keys.sort).to eq(["13601", "78613", "78702-78751"])
+        zip_cities = "78751,13601,78613,78700-78750".zip_cities grouped: true
+        expect(zip_cities.keys.sort).to eq(["13601", "78613", "78701-78751"])
 
-        zip_info = zip_cities["78702-78751"]
+        zip_info = zip_cities["78701-78751"]
         expect(zip_info[:city]).to eq("Austin")
         expect(zip_info[:state]).to eq("TX")
         expect(zip_info[:zip].start_with?("78701")).to eq(true)
@@ -219,9 +219,9 @@ describe Zipcoder do
       end
 
       it "returns just names of cities grouped" do
-        zip_cities = "78751,13601,78613,78702-78750".zip_cities grouped: true, names_only: true
-        expect(zip_cities.keys.sort).to eq(["13601", "78613", "78702-78751"])
-        expect(zip_cities).to eq({"78702-78751" => "Austin, TX", "78613" => "Cedar Park, TX", "13601" => "Watertown, NY"})
+        zip_cities = "78751,13601,78613,78700-78750".zip_cities grouped: true, names_only: true
+        expect(zip_cities.keys.sort).to eq(["13601", "78613", "78701-78751"])
+        expect(zip_cities).to eq({"78701-78751" => "Austin, TX", "78613" => "Cedar Park, TX", "13601" => "Watertown, NY"})
       end
     end
   end

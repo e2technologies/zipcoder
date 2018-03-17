@@ -7,6 +7,8 @@ Gem for performing zip code lookup operations
 
 ## Revision History
 
+ - v0.6.1:
+   - bug fix for the "grouped" option in the "zip_cities" method
  - v0.6.0:
    - added "grouped" option to "zip_cities"
  - v0.5.0:
