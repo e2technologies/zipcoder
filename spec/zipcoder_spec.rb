@@ -284,8 +284,9 @@ describe Zipcoder do
       end
       it "only returns the zip codes" do
         zip_codes = "Austin, TX".city_info zips_only: true
-        expect(zip_codes.count).to eq(41)
+        expect(zip_codes.count).to eq(47)
         expect(zip_codes[0]).to eq('78701')
+        expect(zip_codes[-1]).to eq('78799')
       end
       it "returns an nil when the city state is non-existent" do
         zip_codes = ", ".city_info

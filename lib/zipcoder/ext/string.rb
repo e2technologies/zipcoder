@@ -29,7 +29,7 @@ class String
     self.split(',').each do |zip_group|
       if zip_group.include? '-'
         components = zip_group.split('-')
-        ((components[0].to_i)...(components[1].to_i)).each do |zip|
+        ((components[0].to_i)..(components[1].to_i)).each do |zip|
           zips.push(zip.to_s)
         end
       else

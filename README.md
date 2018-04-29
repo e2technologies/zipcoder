@@ -7,6 +7,8 @@ Gem for performing zip code lookup operations
 
 ## Revision History
 
+ - v0.7.2:
+   - minro bug fixes
  - v0.7.0:
    - added "zips_only" option to "city_info"
  - v0.6.1:
