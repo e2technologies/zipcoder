@@ -287,6 +287,10 @@ describe Zipcoder do
         expect(zip_codes.count).to eq(41)
         expect(zip_codes[0]).to eq('78701')
       end
+      it "returns an nil when the city state is non-existent" do
+        zip_codes = ", ".city_info
+        expect(zip_codes).to be_nil
+      end
     end
 
     describe "state_cities" do

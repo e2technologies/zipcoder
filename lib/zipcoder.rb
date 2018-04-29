@@ -118,7 +118,9 @@ module Zipcoder
     cached_value = self.cacher.read_city_cache(cache_key)
 
     # Return it
-    if kwargs[:zips_only]
+    if cached_value == nil
+      nil
+    elsif kwargs[:zips_only]
       cached_value[:zip].breakout_zips
     else
       self._filter_hash_args cached_value, kwargs[:keys]
