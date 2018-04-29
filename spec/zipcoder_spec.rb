@@ -282,6 +282,11 @@ describe Zipcoder do
         expect(city_info[:lat]).to be_nil
         expect(city_info[:long]).to be_nil
       end
+      it "only returns the zip codes" do
+        zip_codes = "Austin, TX".city_info zips_only: true
+        expect(zip_codes.count).to eq(41)
+        expect(zip_codes[0]).to eq('78701')
+      end
     end
 
     describe "state_cities" do

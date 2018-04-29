@@ -118,7 +118,11 @@ module Zipcoder
     cached_value = self.cacher.read_city_cache(cache_key)
 
     # Return it
-    self._filter_hash_args cached_value, kwargs[:keys]
+    if kwargs[:zips_only]
+      cached_value[:zip].breakout_zips
+    else
+      self._filter_hash_args cached_value, kwargs[:keys]
+    end
   end
 
   # Returns the cities in a state
