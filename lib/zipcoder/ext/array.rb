@@ -28,6 +28,11 @@ class Array
 
     end
 
+    # Return nil if the array is empty
+    if last == nil and start == nil
+        return ''
+    end
+
     if last == start
       zips << start.to_zip
     else
