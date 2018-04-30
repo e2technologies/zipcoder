@@ -57,21 +57,12 @@ module Zipcoder
     max = kwargs[:max]
 
     cities = {}
-    last_key = nil
-    last_zip = nil
     self._parse_zip_string(zip_string).each do |zip|
       info = zip.zip_info
-      if info == nil
-        if last_zip != nil and zip.to_i == last_zip.to_i + 1
-          key = last_key
-        else
-          key = nil
-        end
-      else
+      key = nil
+      if info != nil
         key = "#{info[:city]}, #{info[:state]}"
       end
-      last_key = key
-      last_zip = zip
 
       if key == nil
         next
@@ -98,13 +89,18 @@ module Zipcoder
         end
       end
     else
-      cities = cities.keys.uniq.sort
+      sorted_cities = cities.keys.uniq.sort
       if kwargs[:names_only]
-        zips = cities
+        zips = sorted_cities
       else
         zips = []
-        cities.each do |key|
-          zips << key.city_info(keys: kwargs[:keys])
+        sorted_cities.each do |city|
+          zip_codes = cities[city]
+          city_detail = city.city_info(keys: kwargs[:keys])
+          if kwargs[:keys] == nil or kwargs[:keys].include? :specified_zip
+            city_detail[:specified_zip] = zip_codes.combine_zips
+          end
+          zips << city_detail
         end
       end
     end

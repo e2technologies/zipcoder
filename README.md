@@ -7,8 +7,12 @@ Gem for performing zip code lookup operations
 
 ## Revision History
 
- - v0.7.2:
-   - minro bug fixes
+ - v0.7.4:
+   - updates "zip_cities" to return valid zip_codes (and not just what you enter)
+   - also added "specified_zip" to the city object when entering zip codes.  This
+     will allow a client to know if all of the zip codes were specified for a city
+ - v0.7.2/3:
+   - minor bug fixes
  - v0.7.0:
    - added "zips_only" option to "city_info"
  - v0.6.1:
@@ -183,7 +187,7 @@ require 'zipcoder'
 
 # Returns the cities for a zip_code
 puts "78701-78750,78613".zip_cities
-# > [{:zip=>"78748", :city=>"Austin", :state=>"TX", :lat=>30.26, :long=>-97.74}, ...
+# > [{:zip=>"78701-78705,78710,78712,78717,...", :specified_zip => "78701-78750", :city=>"Austin", :state=>"TX", :lat=>30.26, :long=>-97.74}, ...
 
 # Returns just the name of the cities
 puts "78701-78750,78613".zip_cities names_only: true
