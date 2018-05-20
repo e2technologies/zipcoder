@@ -14,7 +14,7 @@ namespace :zipcoder do
   task :update do
 
     # Fetch the latest database file
-    uri = URI("http://federalgovernmentzipcodes.us/free-zipcode-database-Primary.csv")
+    uri = URI("http://federalgovernmentzipcodes.us/free-zipcode-database.csv")
     puts "Downloading newest zip codes from '#{uri.to_s}'"
     doc = Net::HTTP.get(uri)
 
@@ -34,20 +34,22 @@ namespace :zipcoder do
 
     # Import the CSV file and build the data structure
     zip_lookup_data = {}
-    city_lookup_data = {}
     csv = CSV.parse(csv_text, :headers => true)
     puts "Importing data from '#{filename}'"
     csv.each do |row|
-      next if row["ZipCodeType"] != "STANDARD"
+      next if row["ZipCodeType"] != "STANDARD" or not (["PRIMARY", "ACCEPTABLE"].include? row["LocationType"])
 
       zip_code = row["Zipcode"]
+      primary = row["LocationType"] == "PRIMARY"
       city = row["City"]
       state = row["State"]
       lat = row["Lat"].to_f
       long = row["Long"].to_f
 
       # Write the zip_lookup_data
-      zip_lookup_data[zip_code] = { zip: zip_code, city: city, state: state, lat: lat, long: long }
+      areas = zip_lookup_data[zip_code] || []
+      areas << { zip: zip_code, city: city, state: state, lat: lat, long: long, primary: primary }
+      zip_lookup_data[zip_code] = areas
     end
 
     # Write the data to the yaml file

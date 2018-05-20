@@ -52,19 +52,23 @@ module Zipcoder
         state_lookup = {}
 
         # Add the zip codes to the cache
-        zip_codes.each do |zip, info|
-          city = _capitalize_all(info[:city])
-          info[:city] = city
-          state = info[:state]
+        zip_codes.each do |zip, cities|
+          cities.each do |info|
+            city = _capitalize_all(info[:city])
+            info[:city] = city
+            state = info[:state]
 
-          # Iterate through the zip codes and add them to the zip cache
-          _write_cache _zip_cache(zip), info
+            # For the zip codes, only store the primary
+            if info[:primary]
+              _write_cache _zip_cache(zip), info
+            end
 
-          # Create the city lookups
-          city_state = "#{city.upcase},#{state.upcase}"
-          infos = city_states[city_state] || []
-          infos << info
-          city_states[city_state] = infos
+            # Create the city lookups
+            city_state = "#{city.upcase},#{state.upcase}"
+            infos = city_states[city_state] || []
+            infos << info
+            city_states[city_state] = infos
+          end
         end
 
         # Normalize each city and populate the state cache
@@ -156,11 +160,13 @@ module Zipcoder
 
         # Iterate through the info and get min/max of zip/lat/long
         infos.each do |info|
+          if info[:primary]
+            lat_min = info[:lat] if info[:lat] < lat_min
+            lat_max = info[:lat] if info[:lat] > lat_max
+            long_min = info[:long] if info[:long] < long_min
+            long_max = info[:long] if info[:long] > long_max
+          end
           zips << info[:zip]
-          lat_min = info[:lat] if info[:lat] < lat_min
-          lat_max = info[:lat] if info[:lat] > lat_max
-          long_min = info[:long] if info[:long] < long_min
-          long_max = info[:long] if info[:long] > long_max
         end
 
         # Create the normalized value

@@ -7,6 +7,9 @@ Gem for performing zip code lookup operations
 
 ## Revision History
 
+ - v0.8.0:
+   - added support for acceptable cities as well.  The "zip_code" lookup will return
+     the primary but the "city, state" lookup will support the acceptable cities
  - v0.7.4:
    - updates "zip_cities" to return valid zip_codes (and not just what you enter)
    - also added "specified_zip" to the city object when entering zip codes.  This

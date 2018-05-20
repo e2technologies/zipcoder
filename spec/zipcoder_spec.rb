@@ -121,7 +121,7 @@ describe Zipcoder do
   describe "#state_cities" do
     it "returns the cities for a state" do
       cities = described_class.state_cities "TX"
-      expect(cities.count).to eq(1170)
+      expect(cities.count).to eq(1586)
 
       city_info = cities[0]
       expect(city_info[:city]).to eq("Abbott")
@@ -132,7 +132,7 @@ describe Zipcoder do
     end
     it "returns the cities for a state filtered" do
       cities = described_class.state_cities "TX", keys: [:zip, :city]
-      expect(cities.count).to eq(1170)
+      expect(cities.count).to eq(1586)
 
       city_info = cities[0]
       expect(city_info[:city]).to eq("Abbott")
@@ -143,7 +143,7 @@ describe Zipcoder do
     end
     it "returns the names of the cities" do
       cities = described_class.state_cities "TX", names_only: true
-      expect(cities.count).to eq(1170)
+      expect(cities.count).to eq(1586)
 
       expect(cities[0]).to eq("Abbott")
     end
@@ -216,7 +216,7 @@ describe Zipcoder do
         zip_info = zip_cities["13601"]
         expect(zip_info[:city]).to eq("Watertown")
         expect(zip_info[:state]).to eq("NY")
-        expect(zip_info[:zip]).to eq("13601,13603")
+        expect(zip_info[:zip]).to eq("13601-13603")
         expect(zip_info[:lat]).to eq(43.97)
         expect(zip_info[:long]).to eq(-75.91)
       end
@@ -282,6 +282,7 @@ describe Zipcoder do
         expect(city_info[:lat]).to eq(30.315)
         expect(city_info[:long]).to eq(-97.71)
       end
+
       it "only returns specified keys" do
         city_info = "Austin, TX".city_info keys: [:zip, :city]
         expect(city_info[:city]).to eq("Austin")
@@ -290,22 +291,33 @@ describe Zipcoder do
         expect(city_info[:lat]).to be_nil
         expect(city_info[:long]).to be_nil
       end
+
       it "only returns the zip codes" do
         zip_codes = "Austin, TX".city_info zips_only: true
         expect(zip_codes.count).to eq(47)
         expect(zip_codes[0]).to eq('78701')
         expect(zip_codes[-1]).to eq('78799')
       end
+
       it "returns an nil when the city state is non-existent" do
         zip_codes = ", ".city_info
         expect(zip_codes).to be_nil
+      end
+
+      it "returns the info for an acceptable city" do
+        city_info = "West Lake Hills, TX".city_info
+        expect(city_info[:city]).to eq("West Lake Hills")
+        expect(city_info[:state]).to eq("TX")
+        expect(city_info[:zip]).to eq("78746")
+        expect(city_info[:lat]).to eq(30.26)
+        expect(city_info[:long]).to eq(-97.74)
       end
     end
 
     describe "state_cities" do
       it "returns the cities for a state" do
         cities = "TX".state_cities
-        expect(cities.count).to eq(1170)
+        expect(cities.count).to eq(1586)
 
         city_info = cities[0]
         expect(city_info[:city]).to eq("Abbott")
@@ -316,7 +328,7 @@ describe Zipcoder do
       end
       it "returns the cities for a state filtered" do
         cities = "TX".state_cities keys: [:zip, :city]
-        expect(cities.count).to eq(1170)
+        expect(cities.count).to eq(1586)
 
         city_info = cities[0]
         expect(city_info[:city]).to eq("Abbott")
@@ -324,6 +336,18 @@ describe Zipcoder do
         expect(city_info[:zip]).to eq("76621")
         expect(city_info[:lat]).to be_nil
         expect(city_info[:long]).to be_nil
+      end
+
+      it "has secondary cities" do
+        contains_acceptable = false
+        "TX".state_cities.each do |info|
+          if info[:city] == "West Lake Hills"
+            contains_acceptable = true
+            break
+          end
+        end
+
+        expect(contains_acceptable).to eq(true)
       end
     end
   end
