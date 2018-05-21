@@ -309,6 +309,11 @@ describe Zipcoder do
         expect(city_info[:long]).to eq(-97.71)
       end
 
+      it "returns nil if it cant find the city" do
+        city_info = "Aus, TX".city_info filter: "78701-78704,78748,13601"
+        expect(city_info).to be_nil
+      end
+
       it "returns an nil when the city state is non-existent" do
         zip_codes = ", ".city_info
         expect(zip_codes).to be_nil

@@ -7,6 +7,8 @@ Gem for performing zip code lookup operations
 
 ## Revision History
 
+ - v0.8.2:
+   - fixed exception if it can't find the city when "filter" is used
  - v0.8.1:
    - added "filter" argument to "city_info" to filter the zip codes
  - v0.8.0:
