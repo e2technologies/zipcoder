@@ -119,6 +119,9 @@ module Zipcoder
     elsif kwargs[:zips_only]
       cached_value[:zip].breakout_zips
     else
+      # Clone the object
+      cached_value = cached_value.clone
+
       # If filter specified, create "specified_zip"
       if kwargs[:filter]
         normal_zips = cached_value[:zip].breakout_zips

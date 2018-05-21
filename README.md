@@ -7,6 +7,8 @@ Gem for performing zip code lookup operations
 
 ## Revision History
 
+ - v0.8.4:
+   - fixed data corruption issue due to not cloning city before modifying
  - v0.8.3:
    - added whitespace removal to "breakout_zips" to handle situation with spaces
  - v0.8.2:
