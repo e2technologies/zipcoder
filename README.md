@@ -7,6 +7,8 @@ Gem for performing zip code lookup operations
 
 ## Revision History
 
+ - v0.8.1:
+   - added "filter" argument to "city_info" to filter the zip codes
  - v0.8.0:
    - added support for acceptable cities as well.  The "zip_code" lookup will return
      the primary but the "city, state" lookup will support the acceptable cities
@@ -225,6 +227,7 @@ Zipcoder.city_info("Atlanta, GA", **args)
 
  - keys [Array] - array of keys to include (filters out the others)
  - zips_only [Bool] - set to "true" if you want an array of just the zip codes for the city
+ - filter [String] - zip code string (i.e. "78701-78704,78748") that will filter the zip codes (ignored if "zip_code")
  
 **notes:**
 
@@ -244,6 +247,9 @@ puts "Austin, TX".city_info
 
 puts "Austin, TX".city_info(zips_only: true)
 # > ["78701", "78702", "78703", ...]
+
+puts "Austin, TX".city_info(filter: "78701-78704,78748")
+# > {:zip=>"78701-78705,78710,78712,78717,...", :specified_zip=> "78701-78704,78748", :city=>"AUSTIN", :state=>"TX", :lat=>30.26, :long=>-97.74}
 ```
 
 #### Method: Zipcoder.state_cities(state, **args)

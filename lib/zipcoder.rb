@@ -113,6 +113,13 @@ module Zipcoder
     cache_key = self._cache_key(city_state)
     cached_value = self.cacher.read_city_cache(cache_key)
 
+    # If filter specified, create "specified_zip"
+    if kwargs[:filter]
+      normal_zips = cached_value[:zip].breakout_zips
+      filter_zips = kwargs[:filter].breakout_zips
+      cached_value[:specified_zip] = (normal_zips & filter_zips).combine_zips
+    end
+
     # Return it
     if cached_value == nil
       nil
