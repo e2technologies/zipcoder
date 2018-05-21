@@ -309,6 +309,16 @@ describe Zipcoder do
         expect(city_info[:long]).to eq(-97.71)
       end
 
+      it "returns the specified zip codes in the filter with space" do
+        city_info = "Austin, TX".city_info filter: " 78701 "
+        expect(city_info[:city]).to eq("Austin")
+        expect(city_info[:state]).to eq("TX")
+        expect(city_info[:specified_zip]).to eq("78701")
+        expect(city_info[:zip].start_with?("78701")).to eq(true)
+        expect(city_info[:lat]).to eq(30.315)
+        expect(city_info[:long]).to eq(-97.71)
+      end
+
       it "returns nil if it cant find the city" do
         city_info = "Aus, TX".city_info filter: "78701-78704,78748,13601"
         expect(city_info).to be_nil

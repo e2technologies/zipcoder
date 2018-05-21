@@ -26,7 +26,7 @@ class String
 
   def breakout_zips
     zips = []
-    self.split(',').each do |zip_group|
+    self.gsub(" ","").split(',').each do |zip_group|
       if zip_group.include? '-'
         components = zip_group.split('-')
         ((components[0].to_i)..(components[1].to_i)).each do |zip|
