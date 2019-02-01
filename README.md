@@ -7,6 +7,14 @@ Gem for performing zip code lookup operations
 
 ## Revision History
 
+ - v0.9.0:
+   - added counties - note that there is a slight inaccuracy.  When a city is in
+     multiple counties (for example Austin, TX), ALL of the zip codes for Austin
+     will list ALL of the counties that Austin is in, even though the individual
+     zip codes aren't necessarily in all of the counties.  This is an artifact
+     of the data being from multiple sources
+   - added printing out the time it took to load the data for performance reasons
+   - updated copyright
  - v0.8.4:
    - fixed data corruption issue due to not cloning city before modifying
  - v0.8.3:
@@ -53,6 +61,12 @@ Gem for performing zip code lookup operations
      than array of zips, lats, longs
  - v0.1.0:
    - Initial Revision
+
+## Data
+The data for this library is taken from several different open source areas and combined together
+
+ - zip codes: [Federal Goverment Zip Codes](http://federalgovernmentzipcodes.us/free-zipcode-database.csv)
+ - counties: [grammakov Github](https://raw.githubusercontent.com/grammakov/USA-cities-and-states/master/us_cities_states_counties.csv)
 
 ## Installation
 
@@ -113,7 +127,7 @@ cacher = Zipcoder::Cacher::Redis.new(**args)
 Zipcoder.load_cache(cacher)
 ```
 
-Please check [here](https://github.com/redis/redis-rb) for the different options 
+Please visit [Redis Github](https://github.com/redis/redis-rb) for the different options 
 to use when instantiating the "Redis" client.
 
 ### Methods
@@ -154,11 +168,11 @@ require 'zipcoder'
 
 # Looks up a zip code by string
 puts "78748".zip_info
-# > {:zip=>"78748", :city=>"AUSTIN", :state=>"TX", :lat=>30.26, :long=>-97.74}
+# > {:zip=>"78748", :city=>"Austin", :county=>"Travis,Williamson,Hays", :state=>"TX", :lat=>30.26, :long=>-97.74}
 
 # Looks up a zip code by integer
 puts 78748.zip_info
-# > {:zip=>"78748", :city=>"Austin", :state=>"TX", :lat=>30.26, :long=>-97.74}
+# > {:zip=>"78748", :city=>"Austin", :county=>"Travis,Williamson,Hays", :state=>"TX", :lat=>30.26, :long=>-97.74}
 
 ```
 
@@ -198,7 +212,7 @@ require 'zipcoder'
 
 # Returns the cities for a zip_code
 puts "78701-78750,78613".zip_cities
-# > [{:zip=>"78701-78705,78710,78712,78717,...", :specified_zip => "78701-78750", :city=>"Austin", :state=>"TX", :lat=>30.26, :long=>-97.74}, ...
+# > [{:zip=>"78701-78705,78710,78712,78717,...", :specified_zip => "78701-78750", :city=>"Austin", :county=>"Travis,...", :state=>"TX", :lat=>30.26, :long=>-97.74}, ...
 
 # Returns just the name of the cities
 puts "78701-78750,78613".zip_cities names_only: true
@@ -249,13 +263,13 @@ Zipcoder.city_info("Atlanta, GA", **args)
 require 'zipcoder'
 
 puts "Austin, TX".city_info
-# > {:zip=>"78701-78705,78710,78712,78717,...", :city=>"AUSTIN", :state=>"TX", :lat=>30.26, :long=>-97.74}
+# > {:zip=>"78701-78705,78710,78712,78717,...", :city=>"Austin", :county=>"Travis,...", :state=>"TX", :lat=>30.26, :long=>-97.74}
 
 puts "Austin, TX".city_info(zips_only: true)
 # > ["78701", "78702", "78703", ...]
 
 puts "Austin, TX".city_info(filter: "78701-78704,78748")
-# > {:zip=>"78701-78705,78710,78712,78717,...", :specified_zip=> "78701-78704,78748", :city=>"AUSTIN", :state=>"TX", :lat=>30.26, :long=>-97.74}
+# > {:zip=>"78701-78705,78710,78712,78717,...", :specified_zip=> "78701-78704,78748", :city=>"Austin", :county=>"Travis,...", :state=>"TX", :lat=>30.26, :long=>-97.74}
 ```
 
 #### Method: Zipcoder.state_cities(state, **args)
@@ -292,6 +306,36 @@ puts "TX".state_cities
 # Returns List
 puts "TX".state_cities names_only: true
 # > ["Abbott", ...
+```
+
+#### Method: Zipcoder.state_counties(state, **args)
+
+This will return the cities in a state
+
+**variations:**
+
+``` ruby
+Zipcoder.state_counties("GA", **args)
+"GA".state_counties(**args)
+```
+ 
+**parameters:**
+
+ - state [String] - the 2 letter state abbreviation
+ - **return** [Array] - list of county names
+
+**arguments:**
+
+ - none
+ 
+**examples:**
+
+``` ruby
+require 'zipcoder'
+
+# Returns List
+puts "TX".state_counties
+# > ["Anderson", ...
 ```
 
 #### Method: Zipcoder.states

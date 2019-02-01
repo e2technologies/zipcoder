@@ -141,17 +141,25 @@ module Zipcoder
     keys = kwargs[:keys]
 
     # Filter the returned cities
-    cities = self.cacher.read_state_cache(state)
+    cities = self.cacher.read_state_cities_cache(state)
     if names_only
       cities
     else
       infos = []
-      self.cacher.read_state_cache(state).each { |city|
+      self.cacher.read_state_cities_cache(state).each { |city|
         infos << self.city_info("#{city}, #{state}", keys: keys)
       }
 
       infos
     end
+  end
+
+  # Returns the counties in a state
+  def self.state_counties(state, **kwargs)
+    state = state.strip.upcase
+
+    # Return the counties
+    self.cacher.read_state_counties_cache(state)
   end
 
   # Returns the states

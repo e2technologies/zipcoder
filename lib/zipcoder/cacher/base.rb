@@ -1,15 +1,70 @@
 require_relative '../ext/array'
 
+=begin
+
+The ZipCoder::Cacher::Base class generates different data structures and then stores
+them for later access based on whichever cacher is selected.  For example, they could
+be stored in memory, Redis, etc.
+
+The generated data structures are as follows
+
+## zipcoder:zip:ZIP
+
+Information for each zip code
+
+ - zip: zip code (e.g. "55340")
+ - city: city name (e.g. "Hamel")
+ - county: County(s) for the zip code (e.g. ["Travis"])
+ - state: state (e.g. "MN")
+ - lat: latitude for the city (e.g. "45.07")
+ - long: longitude for the city (e.g. "-93.58")
+
+## zipcoder:city:CITY,STATE
+
+Information for each city
+
+ - city: city name (e.g. "Anderson")
+ - county: city county(s) (e.g. ["Travis"])
+ - state: city state (e.g. "IN")
+ - zip: list of zip codes for the city (e.g. "46011-46013,46016-46017")
+ - lat: latitude for the city (e.g. "40.09")
+ - long: longitude for the city (e.g. "-85.68")
+
+## zipcoder:county:COUNTY,STATE
+
+Information for each county
+
+ - county: county name
+ - cities: cities in the county
+ - state: county state
+ - zip: list of zip codes for the county (e.g. "46011-46013,46016-46017")
+ - lat: latitude for the county (e.g. "40.09")
+ - long: longitude for the county (e.g. "-85.68")
+
+## zipcoder:state:cities:STATE
+
+List of cities in the state
+
+## zipcoder:state:counties:STATE
+
+List of counties in the state
+
+## zipcoder:states
+
+List of the states in the US
+
+=end
+
 module Zipcoder
   module Cacher
-    # The cacher base class places all of the objects in memory.  The
-    # abstraction will later allow us to override for MemCacher and
-    # Redis implementations
     class Base
+
       KEY_BASE = "zipcoder"
       KEY_ZIP = "#{KEY_BASE}:zip"
       KEY_CITY = "#{KEY_BASE}:city"
-      KEY_STATE = "#{KEY_BASE}:state"
+      KEY_COUNTY = "#{KEY_BASE}:county"
+      KEY_STATE_CITIES = "#{KEY_BASE}:state:cities"
+      KEY_STATE_COUNTIES = "#{KEY_BASE}:state:counties"
       KEY_STATES = "#{KEY_BASE}:states"
 
       #region Override These
@@ -40,6 +95,8 @@ module Zipcoder
       end
 
       def load
+        start_time = Time.now
+
         this_dir = File.expand_path(File.dirname(__FILE__))
 
         # Load zip cache from file
@@ -49,7 +106,8 @@ module Zipcoder
         # Initialize
         _empty_cache
         city_states = {}
-        state_lookup = {}
+        state_cities_lookup = {}
+        state_counties_lookup = {}
 
         # Add the zip codes to the cache
         zip_codes.each do |zip, cities|
@@ -80,19 +138,32 @@ module Zipcoder
           normalized = _normalize_city(infos)
           _write_cache _city_cache(city_state), normalized
 
-          # Populate the State Cache
-          cities = state_lookup[state] || []
+          # Populate the State City Cache
+          cities = state_cities_lookup[state] || []
           cities << city
-          state_lookup[state] = cities
+          state_cities_lookup[state] = cities
+
+          # Populate the State Counties Cache
+          counties = state_counties_lookup[state] || []
+          counties += normalized[:county].split(",")
+          state_counties_lookup[state] = counties
         end
 
         # Set the cities cache
-        state_lookup.each do |state, cities|
-          _write_cache _state_cache(state), cities.sort
+        state_cities_lookup.each do |state, cities|
+          _write_cache _state_cities_cache(state), cities.sort
+        end
+
+        # Set the cities cache
+        state_counties_lookup.each do |state, counties|
+          _write_cache _state_counties_cache(state), counties.sort.uniq
         end
 
         # Set the states cache
-        self._write_cache _states, state_lookup.keys.sort
+        self._write_cache _states, state_cities_lookup.keys.sort
+
+        # Print the alpsed time
+        puts "ZipCoder initialization time: #{Time.now-start_time}"
       end
 
       def read_zip_cache(zip)
@@ -103,8 +174,12 @@ module Zipcoder
         _read_cache _city_cache(city_state)
       end
 
-      def read_state_cache(state)
-        _read_cache _state_cache(state)
+      def read_state_cities_cache(state)
+        _read_cache _state_cities_cache(state)
+      end
+
+      def read_state_counties_cache(state)
+        _read_cache _state_counties_cache(state)
       end
 
       def read_states
@@ -137,8 +212,12 @@ module Zipcoder
         "#{KEY_CITY}:#{city_state}"
       end
 
-      def _state_cache(state)
-        "#{KEY_STATE}:#{state}"
+      def _state_cities_cache(state)
+        "#{KEY_STATE_CITIES}:#{state}"
+      end
+
+      def _state_counties_cache(state)
+        "#{KEY_STATE_COUNTIES}:#{state}"
       end
 
       def _states
@@ -152,7 +231,8 @@ module Zipcoder
       # Normalizes the values
       def _normalize_city(infos)
         # Values
-        zips =[]
+        zips = []
+        counties = []
         lat_min = 200
         lat_max = -200
         long_min = 200
@@ -167,6 +247,7 @@ module Zipcoder
             long_max = info[:long] if info[:long] > long_max
           end
           zips << info[:zip]
+          counties += info[:county].split(",")
         end
 
         # Create the normalized value
@@ -175,6 +256,7 @@ module Zipcoder
         elsif infos.count == 1
           normalized = {
               city: infos[0][:city],
+              county: infos[0][:county],
               state: infos[0][:state],
               zip: infos[0][:zip],
               lat: infos[0][:lat],
@@ -183,6 +265,7 @@ module Zipcoder
         else
           normalized = {
               city: infos[0][:city],
+              county: counties.uniq.join(","),
               state: infos[0][:state],
               zip: zips.combine_zips,
               lat: ((lat_min+lat_max)/2).round(4),

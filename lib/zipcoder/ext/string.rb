@@ -16,6 +16,10 @@ class String
     Zipcoder.state_cities self, **kwargs
   end
 
+  def state_counties(**kwargs)
+    Zipcoder.state_counties self, **kwargs
+  end
+
   def to_zip
     self
   end

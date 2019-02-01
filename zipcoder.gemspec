@@ -7,11 +7,10 @@ Gem::Specification.new do |spec|
   spec.name          = "zipcoder"
   spec.version       = Zipcoder::VERSION
   spec.authors       = ["Eric Chapman"]
-  spec.email         = ["eric.chappy@gmail.com"]
+  spec.email         = ["chapman@e2tec.com"]
 
   spec.summary       = %q{Converts zip codes to cities, lat/long, and vice-versa}
-  #spec.description   = %q{TODO: Write a longer description or delete this line.}
-  spec.homepage      = 'https://github.com/ericchapman/zipcoder'
+  spec.homepage      = 'https://github.com/e2technologies/zipcoder'
   spec.license       = "MIT"
 
   spec.files         = `git ls-files -z`.split("\x0")

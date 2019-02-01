@@ -22,6 +22,7 @@ describe Zipcoder do
     it "returns the info for a particular zip_code" do
       zip_info = described_class.zip_info "78748"
       expect(zip_info[:city]).to eq("Austin")
+      expect(zip_info[:county]).to eq("Travis,Williamson,Hays")
       expect(zip_info[:state]).to eq("TX")
       expect(zip_info[:zip]).to eq("78748")
       expect(zip_info[:lat]).to eq(30.26)
@@ -31,6 +32,7 @@ describe Zipcoder do
     it "returns the info for a particular zip_code" do
       zip_info = described_class.zip_info 78748
       expect(zip_info[:city]).to eq("Austin")
+      expect(zip_info[:county]).to eq("Travis,Williamson,Hays")
       expect(zip_info[:state]).to eq("TX")
       expect(zip_info[:zip]).to eq("78748")
       expect(zip_info[:lat]).to eq(30.26)
@@ -46,6 +48,7 @@ describe Zipcoder do
       it "only returns specified keys" do
         zip_info = described_class.zip_info "78748", keys: [:city, :state]
         expect(zip_info[:city]).to eq("Austin")
+        expect(zip_info[:county]).to be_nil
         expect(zip_info[:state]).to eq("TX")
         expect(zip_info[:zip]).to be_nil
         expect(zip_info[:lat]).to be_nil
@@ -87,6 +90,7 @@ describe Zipcoder do
     it "returns the normalized city/state value" do
       city_info = described_class.city_info "Austin, TX"
       expect(city_info[:city]).to eq("Austin")
+      expect(city_info[:county]).to eq("Travis,Williamson,Hays")
       expect(city_info[:state]).to eq("TX")
       expect(city_info[:zip].start_with?("78701")).to eq(true)
       expect(city_info[:lat]).to eq(30.315)
@@ -96,6 +100,7 @@ describe Zipcoder do
     it "returns the normalized city/state value with space" do
       city_info = described_class.city_info " San Antonio , TX"
       expect(city_info[:city]).to eq("San Antonio")
+      expect(city_info[:county]).to eq("Bexar,Comal")
       expect(city_info[:state]).to eq("TX")
       expect(city_info[:zip].start_with?("78201")).to eq(true)
       expect(city_info[:lat]).to eq(29.435)
@@ -125,6 +130,7 @@ describe Zipcoder do
 
       city_info = cities[0]
       expect(city_info[:city]).to eq("Abbott")
+      expect(city_info[:county]).to eq("Hill")
       expect(city_info[:state]).to eq("TX")
       expect(city_info[:zip]).to eq("76621")
       expect(city_info[:lat]).to eq(31.88)
@@ -136,6 +142,7 @@ describe Zipcoder do
 
       city_info = cities[0]
       expect(city_info[:city]).to eq("Abbott")
+      expect(city_info[:county]).to be_nil
       expect(city_info[:state]).to be_nil
       expect(city_info[:zip]).to eq("76621")
       expect(city_info[:lat]).to be_nil
@@ -149,6 +156,15 @@ describe Zipcoder do
     end
   end
 
+  describe "#state_counties" do
+    it "returns the names of the counties for a state" do
+      counties = described_class.state_counties "TX"
+      expect(counties.count).to eq(250)
+
+      expect(counties[0]).to eq("Anderson")
+    end
+  end
+
   describe "#zip_cities" do
     it "returns a city for one zip code" do
       zip_cities = "78748".zip_cities
@@ -156,6 +172,7 @@ describe Zipcoder do
 
       zip_info = zip_cities[0]
       expect(zip_info[:city]).to eq("Austin")
+      expect(zip_info[:county]).to eq("Travis,Williamson,Hays")
       expect(zip_info[:state]).to eq("TX")
       expect(zip_info[:zip]).to eq("78701-78705,78710,78712,78717,78719,78721-78739,78741-78742,78744-78754,78756-78759,78798-78799")
       expect(zip_info[:specified_zip]).to eq("78748")
@@ -169,6 +186,7 @@ describe Zipcoder do
 
       zip_info = zip_cities[0]
       expect(zip_info[:city]).to eq("Austin")
+      expect(zip_info[:county]).to eq("Travis,Williamson,Hays")
       expect(zip_info[:state]).to eq("TX")
       expect(zip_info[:zip]).to eq("78701-78705,78710,78712,78717,78719,78721-78739,78741-78742,78744-78754,78756-78759,78798-78799")
       expect(zip_info[:specified_zip]).to eq("78702-78705,78710,78712,78717,78719,78721-78739,78741-78742,78744-78750")
@@ -177,6 +195,7 @@ describe Zipcoder do
 
       zip_info = zip_cities[1]
       expect(zip_info[:city]).to eq("Cedar Park")
+      expect(zip_info[:county]).to eq("Williamson")
       expect(zip_info[:state]).to eq("TX")
       expect(zip_info[:zip]).to eq("78613")
       expect(zip_info[:specified_zip]).to eq("78613")
@@ -201,6 +220,7 @@ describe Zipcoder do
 
         zip_info = zip_cities["78701-78705,78710,78712,78717,78719,78721-78739,78741-78742,78744-78751"]
         expect(zip_info[:city]).to eq("Austin")
+        expect(zip_info[:county]).to eq("Travis,Williamson,Hays")
         expect(zip_info[:state]).to eq("TX")
         expect(zip_info[:zip]).to eq("78701-78705,78710,78712,78717,78719,78721-78739,78741-78742,78744-78754,78756-78759,78798-78799")
         expect(zip_info[:lat]).to eq(30.315)
@@ -208,6 +228,7 @@ describe Zipcoder do
 
         zip_info = zip_cities["78613"]
         expect(zip_info[:city]).to eq("Cedar Park")
+        expect(zip_info[:county]).to eq("Williamson")
         expect(zip_info[:state]).to eq("TX")
         expect(zip_info[:zip]).to eq("78613")
         expect(zip_info[:lat]).to eq(30.51)
@@ -215,6 +236,7 @@ describe Zipcoder do
 
         zip_info = zip_cities["13601"]
         expect(zip_info[:city]).to eq("Watertown")
+        expect(zip_info[:county]).to eq("Jefferson")
         expect(zip_info[:state]).to eq("NY")
         expect(zip_info[:zip]).to eq("13601-13603")
         expect(zip_info[:lat]).to eq(43.97)
@@ -257,6 +279,7 @@ describe Zipcoder do
       it "returns the info for a particular zip_code" do
         zip_info = "78748".zip_info
         expect(zip_info[:city]).to eq("Austin")
+        expect(zip_info[:county]).to eq("Travis,Williamson,Hays")
         expect(zip_info[:state]).to eq("TX")
         expect(zip_info[:zip]).to eq("78748")
         expect(zip_info[:lat]).to eq(30.26)
@@ -266,6 +289,7 @@ describe Zipcoder do
       it "only returns specified keys" do
         zip_info = "78748".zip_info keys: [:city, :state]
         expect(zip_info[:city]).to eq("Austin")
+        expect(zip_info[:county]).to be_nil
         expect(zip_info[:state]).to eq("TX")
         expect(zip_info[:zip]).to be_nil
         expect(zip_info[:lat]).to be_nil
@@ -277,6 +301,7 @@ describe Zipcoder do
       it "returns the info for a particular city" do
         city_info = "Austin, TX".city_info
         expect(city_info[:city]).to eq("Austin")
+        expect(city_info[:county]).to eq("Travis,Williamson,Hays")
         expect(city_info[:state]).to eq("TX")
         expect(city_info[:zip].start_with?("78701")).to eq(true)
         expect(city_info[:lat]).to eq(30.315)
@@ -286,6 +311,7 @@ describe Zipcoder do
       it "only returns specified keys" do
         city_info = "Austin, TX".city_info keys: [:zip, :city]
         expect(city_info[:city]).to eq("Austin")
+        expect(city_info[:county]).to be_nil
         expect(city_info[:state]).to be_nil
         expect(city_info[:zip].start_with?("78701")).to eq(true)
         expect(city_info[:lat]).to be_nil
@@ -302,6 +328,7 @@ describe Zipcoder do
       it "returns the specified zip codes in the filter" do
         city_info = "Austin, TX".city_info filter: "78701-78704,78748,13601"
         expect(city_info[:city]).to eq("Austin")
+        expect(city_info[:county]).to eq("Travis,Williamson,Hays")
         expect(city_info[:state]).to eq("TX")
         expect(city_info[:specified_zip]).to eq("78701-78704,78748")
         expect(city_info[:zip].start_with?("78701")).to eq(true)
@@ -312,6 +339,7 @@ describe Zipcoder do
       it "returns the specified zip codes in the filter with space" do
         city_info = "Austin, TX".city_info filter: " 78701 "
         expect(city_info[:city]).to eq("Austin")
+        expect(city_info[:county]).to eq("Travis,Williamson,Hays")
         expect(city_info[:state]).to eq("TX")
         expect(city_info[:specified_zip]).to eq("78701")
         expect(city_info[:zip].start_with?("78701")).to eq(true)
@@ -332,6 +360,7 @@ describe Zipcoder do
       it "returns the info for an acceptable city" do
         city_info = "West Lake Hills, TX".city_info
         expect(city_info[:city]).to eq("West Lake Hills")
+        expect(city_info[:county]).to eq("Travis")
         expect(city_info[:state]).to eq("TX")
         expect(city_info[:zip]).to eq("78746")
         expect(city_info[:lat]).to eq(30.26)
@@ -346,6 +375,7 @@ describe Zipcoder do
 
         city_info = cities[0]
         expect(city_info[:city]).to eq("Abbott")
+        expect(city_info[:county]).to eq("Hill")
         expect(city_info[:state]).to eq("TX")
         expect(city_info[:zip]).to eq("76621")
         expect(city_info[:lat]).to eq(31.88)
@@ -357,6 +387,7 @@ describe Zipcoder do
 
         city_info = cities[0]
         expect(city_info[:city]).to eq("Abbott")
+        expect(city_info[:county]).to be_nil
         expect(city_info[:state]).to be_nil
         expect(city_info[:zip]).to eq("76621")
         expect(city_info[:lat]).to be_nil
@@ -375,12 +406,22 @@ describe Zipcoder do
         expect(contains_acceptable).to eq(true)
       end
     end
+
+    describe "#state_counties" do
+      it "returns the names of the counties for a state" do
+        counties = "TX".state_counties
+        expect(counties.count).to eq(250)
+
+        expect(counties[0]).to eq("Anderson")
+      end
+    end
   end
 
   describe("Integer") do
     it "returns the info for a particular zip_code" do
       zip_info = 78748.zip_info
       expect(zip_info[:city]).to eq("Austin")
+      expect(zip_info[:county]).to eq("Travis,Williamson,Hays")
       expect(zip_info[:state]).to eq("TX")
       expect(zip_info[:zip]).to eq("78748")
       expect(zip_info[:lat]).to eq(30.26)
