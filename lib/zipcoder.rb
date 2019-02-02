@@ -19,9 +19,9 @@ module Zipcoder
   end
 
   # Loads the data into memory
-  def self.load_cache(cacher=nil)
+  def self.load_cache(cacher=nil, data:nil)
     @@cacher = cacher || Cacher::Memory.new
-    self.cacher.load
+    self.cacher.load data:data
   end
 
   # Looks up zip code information

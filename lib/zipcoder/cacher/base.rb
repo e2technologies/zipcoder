@@ -94,13 +94,16 @@ module Zipcoder
         self._init_cache **kwargs
       end
 
-      def load
+      def load(data: nil)
         start_time = Time.now
 
-        this_dir = File.expand_path(File.dirname(__FILE__))
-
         # Load zip cache from file
-        zip_data = File.join(this_dir, '..', '..', 'data', 'zip_data.yml')
+        if data != nil
+          zip_data = File.open(data)
+        else
+          this_dir = File.expand_path(File.dirname(__FILE__))
+          zip_data = File.join(this_dir, '..', '..', 'data', 'data.yml' )
+        end
         zip_codes = YAML.load(File.open(zip_data))
 
         # Initialize
@@ -112,8 +115,7 @@ module Zipcoder
         # Add the zip codes to the cache
         zip_codes.each do |zip, cities|
           cities.each do |info|
-            city = _capitalize_all(info[:city])
-            info[:city] = city
+            city = info[:city]
             state = info[:state]
 
             # For the zip codes, only store the primary
@@ -222,10 +224,6 @@ module Zipcoder
 
       def _states
         KEY_STATES
-      end
-
-      def _capitalize_all(string)
-        string.split(' ').map {|w| w.capitalize }.join(' ')
       end
 
       # Normalizes the values

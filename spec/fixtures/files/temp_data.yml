@@ -1,0 +1,25 @@
+---
+'00705':
+  - :zip: '00705'
+    :city: AIBONITO
+    :county: Aibonito
+    :state: PR
+    :lat: 18.14
+    :long: -66.26
+    :primary: true
+'00610':
+  - :zip: '00610'
+    :city: ANASCO
+    :county: Anasco
+    :state: PR
+    :lat: 18.28
+    :long: -67.14
+    :primary: true
+'00612':
+  - :zip: '00612'
+    :city: ARECIBO
+    :county: Arecibo
+    :state: PR
+    :lat: 18.45
+    :long: -66.73
+    :primary: true
