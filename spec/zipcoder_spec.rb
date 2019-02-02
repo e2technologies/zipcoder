@@ -5,6 +5,13 @@ describe Zipcoder do
     Zipcoder.load_cache
   end
 
+  after(:all) {
+    Zipcoder.config do |config|
+      config.data = nil
+      config.cacher = nil
+    end
+  }
+
   it "has a version number" do
     expect(Zipcoder::VERSION).not_to be nil
   end

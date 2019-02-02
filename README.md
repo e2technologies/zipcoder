@@ -7,6 +7,8 @@ Gem for performing zip code lookup operations
 
 ## Revision History
 
+ - v0.9.2:
+   - added config class
  - v0.9.1:
    - added ability to use a different data source
    - added support for data from unitestateszipcodes.org"
@@ -120,8 +122,11 @@ version.  I had to use v3.3.5 to test.*
 require 'zipcoder'
 require 'zipcoder/cacher/redis'
 
-cacher = Zipcoder::Cacher::Redis.new(**args)
-Zipcoder.load_cache(cacher)
+Zipcoder.config do |config|
+  config.cacher = Zipcoder::Cacher::Redis.new(**args)
+end
+
+Zipcoder.load_cache
 ```
 
 Please visit [Redis Github](https://github.com/redis/redis-rb) for the different options 
@@ -140,7 +145,11 @@ To override the default, you can create a new YAML file with the same format as 
 ```ruby
 require 'zipcoder'
 
-Zipcoder.load_cache(data: "path_to_data/data.yml")
+Zipcoder.config do |config|
+  config.data = "path_to_data/data.yml"
+end
+
+Zipcoder.load_cache
 ```
 
 ##### unitestateszipcodes.org
@@ -333,7 +342,7 @@ puts "TX".state_cities names_only: true
 
 #### Method: Zipcoder.state_counties(state, **args)
 
-This will return the cities in a state
+This will return the counties in a state
 
 **variations:**
 

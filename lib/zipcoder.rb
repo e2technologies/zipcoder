@@ -10,6 +10,17 @@ module Zipcoder
   class ZipcoderError < Exception
   end
 
+  class Config
+    attr_accessor :cacher
+    attr_accessor :data
+  end
+
+  CONFIG = Config.new
+
+  def self.config(&block)
+    block.call(CONFIG)
+  end
+
   @@cacher = nil
   def self.cacher
     if @@cacher == nil
@@ -19,9 +30,9 @@ module Zipcoder
   end
 
   # Loads the data into memory
-  def self.load_cache(cacher=nil, data:nil)
-    @@cacher = cacher || Cacher::Memory.new
-    self.cacher.load data:data
+  def self.load_cache
+    @@cacher = CONFIG.cacher || Cacher::Memory.new
+    self.cacher.load data: CONFIG.data
   end
 
   # Looks up zip code information

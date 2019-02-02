@@ -10,11 +10,22 @@ describe Zipcoder::Cacher::Redis do
       allow(Zipcoder::Cacher::Redis).to receive(:_create_redis_client) do
         RedisStub.new
       end
-      Zipcoder.load_cache Zipcoder::Cacher::Redis.new
+      Zipcoder.config do |config|
+        config.cacher = Zipcoder::Cacher::Redis.new
+      end
+
+      Zipcoder.load_cache
     end
 
     stub_redis_once = true
   end
+
+  after(:each) {
+    Zipcoder.config do |config|
+      config.data = nil
+      config.cacher = nil
+    end
+  }
 
   describe "#zip_info" do
     it "match" do

@@ -58,6 +58,7 @@ List of the states in the US
 module Zipcoder
   module Cacher
     class Base
+      attr_accessor :loaded
 
       KEY_BASE = "zipcoder"
       KEY_ZIP = "#{KEY_BASE}:zip"
@@ -92,9 +93,12 @@ module Zipcoder
 
       def initialize(**kwargs)
         self._init_cache **kwargs
+        self.loaded = false
       end
 
       def load(data: nil)
+        return if self.loaded
+
         start_time = Time.now
 
         # Load zip cache from file
@@ -166,6 +170,8 @@ module Zipcoder
 
         # Print the alpsed time
         puts "ZipCoder initialization time: #{Time.now-start_time}"
+
+        self.loaded = true
       end
 
       def read_zip_cache(zip)
